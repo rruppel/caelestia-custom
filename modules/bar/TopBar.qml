@@ -21,7 +21,7 @@ Variants {
         readonly property int edgeGap: 12
         readonly property int gap: 8
         readonly property int alertsWidth: 52
-        readonly property int clockWidth: 112
+        readonly property int clockWidth: 165
         readonly property int logoWidth: 34
         readonly property int netWidth: 150
         readonly property int soundWidth: 94
@@ -73,18 +73,12 @@ Variants {
                 anchors.fill: parent
                 radius: height / 2
                 color: scope.pillColour
-                Row {
+                Text {
                     anchors.centerIn: parent
-                    spacing: 5
-                    MaterialIcon {
-                        text: "schedule"
-                        color: Colours.palette.m3primary
-                    }
-                    Text {
-                        text: Time.format("hh:mm AP")
-                        color: scope.inkColour
-                        font.pixelSize: 12
-                    }
+                    text: Time.format("ddd d MMM  HH:mm")
+                    color: scope.inkColour
+                    font.pixelSize: 12
+                    font.weight: Font.Medium
                 }
             }
         }
