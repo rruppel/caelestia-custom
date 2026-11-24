@@ -381,6 +381,7 @@ Variants {
                         TrayItem {
                             width: 26
                             height: 26
+                            nativeMenuOnRightClick: true
                         }
                     }
                 }
