@@ -34,10 +34,13 @@ def main():
     mh = round(monitor["height"] / scale)
     # Hyprland's reserved: top, bottom, left, right.
     top, bottom, left, right = monitor.get("reserved", [0, 0, 0, 0])
-    # Floating TopBar does not reserve compositor space. Its pills begin at
-    # y=12 and are 34px high; keep another 20px of clear space underneath.
+    # Hyprbars adds an external title decoration above floating windows.
+    # Leave a generous buffer below the floating TopBar (ends at y=46).
+    # hyprctl's reported window y can exclude decoration extents, so y=78
+    # may render a title bar visually adjacent to/overlapping the TopBar.
+    # Keep the snapped *client* top >= 120px, plus the grid's 12px margin.
     # Honour larger compositor reservations when present.
-    topbar_clearance = 12 + 34 + 20
+    topbar_clearance = 120
     effective_top = max(top, topbar_clearance)
     x0, y0 = mx + left, my + effective_top
     usable_w, usable_h = mw - left - right, mh - effective_top - bottom
