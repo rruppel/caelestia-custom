@@ -1,7 +1,7 @@
 pragma ComponentBehavior: Bound
 
-// Visual six-zone picker. Trigger via: qs -c caelestia ipc call snapzones toggle
-// The automatic drag lifecycle is intentionally not hooked up in this first version.
+// Explicit six-zone picker, opened from the TopBar or a Hyprland keybind.
+// Never hooks into or changes normal pointer-based window dragging.
 import QtQuick
 import Quickshell
 import Quickshell.Io
@@ -69,6 +69,31 @@ Scope {
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
             color: "#6B081423"
+
+            Rectangle {
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.margins: 12
+                width: 34
+                height: 34
+                radius: 17
+                color: "#D71B2941"
+                border.color: "#6EA8DA"
+                border.width: 1
+                z: 2
+
+                Text {
+                    anchors.centerIn: parent
+                    text: "×"
+                    font.pixelSize: 25
+                    color: "#EDF3FF"
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.selectorVisible = false
+                }
+            }
 
             Rectangle {
                 anchors.fill: parent
