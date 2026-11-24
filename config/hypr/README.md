@@ -32,3 +32,29 @@ in the backup and the external file can be removed.
 
 Some applications (notably browsers with their own client-side titlebars) may
 need per-window no-bar rules. Test before adding exclusions.
+
+## Space for Caelestia floating TopBar (Hyprland 0.53.x)
+
+The TopBar overlays the upper 12–46 px of the desktop. Without reserved space,
+normal tiled windows may begin immediately below the monitor edge and overlap
+the bar. The file `topbar-clearance.conf` adds 60 px of compositor reserved
+space at the top of each monitor; this yields a comfortable buffer under the
+TopBar while leaving Hyprbars styling and normal dragging intact.
+
+Apply after updating the repo:
+
+```bash
+bash ~/.config/quickshell/caelestia/config/hypr/install-topbar-clearance.sh
+```
+
+The installer symlinks the versioned file, adds one `source` line to
+`~/.config/hypr/hyprland.conf`, saves a timestamped backup before writing,
+and reloads Hyprland. It refuses to add a second reservation if it detects an
+existing `monitor = ..., addreserved, ...` rule in other local config files.
+
+Revert: remove `source = ~/.config/hypr/topbar-clearance.conf` from
+`~/.config/hypr/hyprland.conf` and run `hyprctl reload`.
+
+**Note:** Explicitly floating windows can still be positioned by the user
+wherever desired. The custom SnapZones script already respects compositor
+reservations, so it should not double-apply the 60 px.
