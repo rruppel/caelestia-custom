@@ -34,11 +34,11 @@ def main():
     mh = round(monitor["height"] / scale)
     # Hyprland's reserved: top, bottom, left, right.
     top, bottom, left, right = monitor.get("reserved", [0, 0, 0, 0])
-    # The floating TopBar ends at y=46. Hyprbars draws its title decoration
-    # above the client position, so y=78 looks cramped while y=132 is too far.
-    # A 93px clearance plus the grid's 12px margin targets client y=105.
+    # Floating TopBar ends at y=46. With Hyprbars decoration, the
+    # user-validated client position for top-row windows is y=89.
+    # The grid adds a 12px outer margin, hence 77px clearance.
     # Honour larger compositor reservations when present.
-    topbar_clearance = 93
+    topbar_clearance = 77
     effective_top = max(top, topbar_clearance)
     x0, y0 = mx + left, my + effective_top
     usable_w, usable_h = mw - left - right, mh - effective_top - bottom
