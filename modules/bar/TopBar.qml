@@ -26,11 +26,12 @@ Variants {
             screen: scope.modelData
             anchors.top: true
             anchors.left: true
-            anchors.topMargin: scope.edgeGap
-            anchors.leftMargin: scope.edgeGap
+            margins.top: scope.edgeGap
+            margins.left: scope.edgeGap
             implicitWidth: 165
             implicitHeight: scope.pillHeight
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
             Rectangle {
@@ -54,11 +55,12 @@ Variants {
             screen: scope.modelData
             anchors.top: true
             anchors.left: true
-            anchors.topMargin: scope.edgeGap
-            anchors.leftMargin: Math.round((scope.modelData.width - implicitWidth) / 2)
+            margins.top: scope.edgeGap
+            margins.left: Math.round((scope.modelData.width - implicitWidth) / 2)
             implicitWidth: Math.max(140, Config.bar.workspaces.shown * 33 + 20)
             implicitHeight: scope.pillHeight
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
             Rectangle {
@@ -109,11 +111,12 @@ Variants {
             screen: scope.modelData
             anchors.top: true
             anchors.right: true
-            anchors.topMargin: scope.edgeGap
-            anchors.rightMargin: scope.edgeGap
+            margins.top: scope.edgeGap
+            margins.right: scope.edgeGap
             implicitWidth: 122
             implicitHeight: scope.pillHeight
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
             Rectangle {
