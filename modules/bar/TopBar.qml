@@ -56,6 +56,11 @@ Variants {
         readonly property var scratchWindows: Hypr.toplevels.values.filter(t =>
             t.workspace?.name === "special:magic" && t.lastIpcObject?.mapped)
         readonly property int scratchWidth: scratchWindows.length > 0 ? 14 + scratchWindows.length * 28 : 0
+        // Keep desktops → SnapZones → scratchpad as one horizontally centred group.
+        readonly property int workspaceWidth: Math.max(148, GlobalConfig.bar.workspaces.shown * 30 + 16)
+        readonly property int centerGroupWidth: workspaceWidth + gap + 34 +
+            (scratchWindows.length > 0 ? gap + scratchWidth : 0)
+        readonly property int centerGroupLeft: Math.round((modelData.width - centerGroupWidth) / 2)
 
         function restoreScratchWindow(address: string): void {
             const targetWorkspace = Hypr.activeWsId;
@@ -169,8 +174,8 @@ Variants {
             anchors.top: true
             anchors.left: true
             margins.top: scope.edgeGap
-            margins.left: Math.round((scope.modelData.width - implicitWidth) / 2)
-            implicitWidth: Math.max(148, GlobalConfig.bar.workspaces.shown * 30 + 16)
+            margins.left: scope.centerGroupLeft
+            implicitWidth: scope.workspaceWidth
             implicitHeight: scope.pillHeight
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             WlrLayershell.layer: WlrLayer.Overlay
@@ -481,9 +486,9 @@ Variants {
             screen: scope.modelData
             visible: scope.scratchWindows.length > 0
             anchors.top: true
-            anchors.right: true
+            anchors.left: true
             margins.top: scope.edgeGap
-            margins.right: scope.afterAudio + scope.traySpace + 2 * (34 + scope.gap)
+            margins.left: scope.centerGroupLeft + scope.workspaceWidth + scope.gap + 34 + scope.gap
             implicitWidth: Math.max(1, scope.scratchWidth)
             implicitHeight: scope.pillHeight
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
@@ -543,7 +548,7 @@ Variants {
             anchors.top: true
             anchors.right: true
             margins.top: scope.edgeGap
-            // One capsule to the left of SnapZones, with the same spacing.
+            // Keep Settings on the right, independent from the centred controls.
             margins.right: scope.afterAudio + scope.traySpace + 34 + scope.gap
             implicitWidth: 34
             implicitHeight: scope.pillHeight
@@ -576,10 +581,10 @@ Variants {
             name: "topbar-snapzones"
             screen: scope.modelData
             anchors.top: true
-            anchors.right: true
+            anchors.left: true
             margins.top: scope.edgeGap
-            // Put the snap button just to the left of the system tray, if present.
-            margins.right: scope.afterAudio + scope.traySpace
+            // Immediately after the workspaces capsule in the centred group.
+            margins.left: scope.centerGroupLeft + scope.workspaceWidth + scope.gap
             implicitWidth: 34
             implicitHeight: scope.pillHeight
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
