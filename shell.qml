@@ -11,6 +11,7 @@ import "modules/background"
 import "modules/bar"
 import "modules/reflection"
 import "modules/systemMonitor"
+import "modules/snapzones"
 import "modules/areapicker"
 import "modules/lock"
 import QtQuick
@@ -33,6 +34,7 @@ ShellRoot {
 
     Background {}
     TopBar {}
+    SnapZones {}
     Reflection {}
     SystemMonitor {}
     Drawers {}
