@@ -461,6 +461,47 @@ Variants {
             }
         }
 
+        // Caelestia Control Center shortcut; keep it separate from system settings.
+        Process {
+            id: openCaelestiaSettings
+            command: ["/home/rruppel/.local/bin/caelestia", "shell", "controlCenter", "open"]
+        }
+
+        StyledWindow {
+            name: "topbar-settings"
+            screen: scope.modelData
+            anchors.top: true
+            anchors.right: true
+            margins.top: scope.edgeGap
+            // One capsule to the left of SnapZones, with the same spacing.
+            margins.right: scope.afterAudio + scope.traySpace + 34 + scope.gap
+            implicitWidth: 34
+            implicitHeight: scope.pillHeight
+            WlrLayershell.exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.layer: WlrLayer.Overlay
+
+            Rectangle {
+                anchors.fill: parent
+                radius: height / 2
+                color: scope.pillColour
+
+                MaterialIcon {
+                    anchors.centerIn: parent
+                    text: "settings"
+                    color: scope.bluetoothAccent
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        if (!openCaelestiaSettings.running)
+                            openCaelestiaSettings.running = true;
+                    }
+                }
+            }
+        }
+
         StyledWindow {
             name: "topbar-snapzones"
             screen: scope.modelData
