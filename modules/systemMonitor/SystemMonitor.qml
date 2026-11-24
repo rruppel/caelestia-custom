@@ -10,6 +10,7 @@ Scope {
     property real ram: -1
     property real gpu: -1
     property real vram: -1
+    property real disk: -1
 
     Process {
         id: metricProcess
@@ -22,6 +23,7 @@ Scope {
                     root.ram = typeof data.ram === "number" ? data.ram : -1;
                     root.gpu = typeof data.gpu === "number" ? data.gpu : -1;
                     root.vram = typeof data.vram === "number" ? data.vram : -1;
+                    root.disk = typeof data.disk === "number" ? data.disk : -1;
                 } catch (error) {
                     console.warn("system-monitor: invalid metrics:", error);
                 }
@@ -53,7 +55,7 @@ Scope {
             right: 26
         }
         implicitWidth: 204
-        implicitHeight: 253
+        implicitHeight: 306
         exclusionMode: ExclusionMode.Ignore
         aboveWindows: false
         focusable: false
@@ -122,6 +124,13 @@ Scope {
                     metricName: "VRAM"
                     percentage: root.vram
                     accentColor: "#B4A0FA"
+                }
+
+                MetricRow {
+                    width: parent.width
+                    metricName: "DISK"
+                    percentage: root.disk
+                    accentColor: "#F2BC8C"
                 }
             }
         }
