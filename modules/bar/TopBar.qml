@@ -142,7 +142,7 @@ Variants {
             anchors.left: true
             margins.top: scope.edgeGap
             margins.left: Math.round((scope.modelData.width - implicitWidth) / 2)
-            implicitWidth: Math.max(148, Config.bar.workspaces.shown * 30 + 16)
+            implicitWidth: Math.max(148, GlobalConfig.bar.workspaces.shown * 30 + 16)
             implicitHeight: scope.pillHeight
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             WlrLayershell.layer: WlrLayer.Overlay
@@ -158,11 +158,11 @@ Variants {
                     spacing: 5
 
                     Repeater {
-                        model: Config.bar.workspaces.shown
+                        model: GlobalConfig.bar.workspaces.shown
 
                         Rectangle {
                             required property int index
-                            readonly property int groupStart: Math.floor((Hypr.activeWsId - 1) / Config.bar.workspaces.shown) * Config.bar.workspaces.shown
+                            readonly property int groupStart: Math.floor((Hypr.activeWsId - 1) / GlobalConfig.bar.workspaces.shown) * GlobalConfig.bar.workspaces.shown
                             readonly property int workspaceId: groupStart + index + 1
                             readonly property bool active: Hypr.activeWsId === workspaceId
                             width: 25
