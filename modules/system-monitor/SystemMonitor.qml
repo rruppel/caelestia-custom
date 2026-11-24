@@ -2,7 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-ShellRoot {
+Scope {
     id: root
 
     // -1 means no reading yet (or NVIDIA metrics unavailable).
@@ -13,7 +13,7 @@ ShellRoot {
 
     Process {
         id: metricProcess
-        command: ["/usr/bin/python3", Quickshell.env("HOME") + "/.local/bin/caelestia-metrics"]
+        command: ["/usr/bin/python3", Quickshell.env("HOME") + "/.config/quickshell/caelestia/modules/system-monitor/caelestia-metrics"]
         stdout: StdioCollector {
             onStreamFinished: {
                 try {
@@ -43,6 +43,7 @@ ShellRoot {
 
     PanelWindow {
         id: panel
+        screen: Quickshell.screens.length > 0 ? Quickshell.screens[0] : null
         anchors {
             top: true
             right: true
