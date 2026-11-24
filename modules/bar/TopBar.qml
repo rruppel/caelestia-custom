@@ -126,7 +126,7 @@ Variants {
                         color: scope.inkColour
                         font.pixelSize: 13
                         font.weight: Font.DemiBold
-                        height: parent.height
+                        height: 24
                         verticalAlignment: Text.AlignVCenter
                     }
                 }
@@ -233,7 +233,7 @@ Variants {
                         color: scope.inkColour
                         font.pixelSize: 13
                         font.weight: Font.DemiBold
-                        height: parent.height
+                        height: 24
                         verticalAlignment: Text.AlignVCenter
                     }
                 }
