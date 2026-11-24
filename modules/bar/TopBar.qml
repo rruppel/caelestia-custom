@@ -536,6 +536,58 @@ Variants {
             }
         }
 
+        // Switch to a random wallpaper from the user's collection on demand.
+        // No background polling: this process runs only when the capsule is clicked.
+        Process {
+            id: nextWallpaper
+            command: [
+                Quickshell.env("HOME") + "/.local/bin/caelestia",
+                "wallpaper", "-r",
+                Quickshell.env("HOME") + "/Pictures/Wallpapers"
+            ]
+            stderr: StdioCollector {
+                onStreamFinished: {
+                    if (text.trim().length > 0)
+                        console.warn("TopBar wallpaper switch:", text.trim());
+                }
+            }
+        }
+
+        StyledWindow {
+            name: "topbar-wallpaper"
+            screen: scope.modelData
+            anchors.top: true
+            anchors.right: true
+            margins.top: scope.edgeGap
+            // Immediately left of Settings in the right-hand group.
+            margins.right: scope.afterAudio + scope.traySpace + 2 * (34 + scope.gap)
+            implicitWidth: 34
+            implicitHeight: scope.pillHeight
+            WlrLayershell.exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.layer: WlrLayer.Overlay
+
+            Rectangle {
+                anchors.fill: parent
+                radius: height / 2
+                color: scope.pillColour
+
+                MaterialIcon {
+                    anchors.centerIn: parent
+                    text: "shuffle"
+                    color: scope.volumeAccent
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        if (!nextWallpaper.running)
+                            nextWallpaper.running = true;
+                    }
+                }
+            }
+        }
+
         // Caelestia Control Center shortcut; keep it separate from system settings.
         Process {
             id: openCaelestiaSettings
