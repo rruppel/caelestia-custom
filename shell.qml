@@ -10,6 +10,7 @@ import "modules/drawers"
 import "modules/background"
 import "modules/bar"
 import "modules/reflection"
+import "modules/system-monitor"
 import "modules/areapicker"
 import "modules/lock"
 import QtQuick
@@ -33,6 +34,7 @@ ShellRoot {
     Background {}
     TopBar {}
     Reflection {}
+    SystemMonitor {}
     Drawers {}
     AreaPicker {}
     Lock {
