@@ -19,6 +19,7 @@ Scope {
 
     ExclusionZone {
         anchors.top: true
+        exclusiveZone: 0 // Top pills float without reserving a full-width strip
     }
 
     ExclusionZone {
