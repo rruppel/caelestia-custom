@@ -170,7 +170,7 @@ StyledWindow {
             radius: root.borderRounding
             borderLeft: bar.implicitWidth - anchors.margins - root.sdfBorderOffset
             borderRight: root.borderThickness - anchors.margins - root.sdfBorderOffset
-            borderTop: root.borderThickness - anchors.margins - root.sdfBorderOffset
+            borderTop: 0 - anchors.margins - root.sdfBorderOffset // Floating topbar: no continuous top strip
             borderBottom: root.borderThickness - anchors.margins - root.sdfBorderOffset
         }
 
