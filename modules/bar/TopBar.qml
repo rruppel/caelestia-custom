@@ -1,7 +1,6 @@
 pragma ComponentBehavior: Bound
 
-// Experimental horizontal bar: three independent layer-shell windows.
-// The original drawers and their popouts are intentionally left untouched.
+// Floating capsule top bar with interactive app tray and system shortcuts.
 import "components"
 import QtQuick
 import Quickshell
@@ -27,7 +26,7 @@ Variants {
         readonly property int alertsWidth: 52
         readonly property int clockWidth: 165
         readonly property int logoWidth: 34
-        readonly property int netWidth: 150
+        readonly property int netWidth: 34
         readonly property int soundWidth: 94
         readonly property int bellWidth: 34
         readonly property int batteryWidth: 72
@@ -35,6 +34,12 @@ Variants {
         readonly property int pillHeight: 34
         readonly property color pillColour: Qt.alpha(Colours.tPalette.m3surfaceContainer, 0.94)
         readonly property color inkColour: Colours.palette.m3onSurface
+        readonly property color alertAccent: "#F7AF6D"
+        readonly property color volumeAccent: "#6CD8C9"
+        readonly property color networkAccent: "#7CA9FF"
+        readonly property color bluetoothAccent: "#BAA5FC"
+        readonly property color bellAccent: "#D6B4FF"
+        readonly property color powerAccent: "#FF8D89"
         readonly property int powerWidth: 34
         readonly property int bluetoothWidth: 34
         readonly property var trayEntries: SystemTray.items.values.filter(i => !GlobalConfig.bar.tray.hiddenIcons.includes(i.id))
@@ -114,12 +119,15 @@ Variants {
                     spacing: 4
                     MaterialIcon {
                         text: "notifications_active"
-                        color: Colours.palette.m3error
+                        color: scope.alertAccent
                     }
                     Text {
                         text: Notifs.notClosed.length
                         color: scope.inkColour
-                        font.pixelSize: 12
+                        font.pixelSize: 13
+                        font.weight: Font.DemiBold
+                        height: parent.height
+                        verticalAlignment: Text.AlignVCenter
                     }
                 }
                 MouseArea {
@@ -218,12 +226,15 @@ Variants {
                     spacing: 6
                     MaterialIcon {
                         text: Audio.muted ? "volume_off" : "headphones"
-                        color: Colours.palette.m3primary
+                        color: scope.volumeAccent
                     }
                     Text {
                         text: Math.round(Audio.volume * 100) + "%"
                         color: scope.inkColour
-                        font.pixelSize: 12
+                        font.pixelSize: 13
+                        font.weight: Font.DemiBold
+                        height: parent.height
+                        verticalAlignment: Text.AlignVCenter
                     }
                 }
                 MouseArea {
@@ -262,20 +273,10 @@ Variants {
                 anchors.fill: parent
                 radius: height / 2
                 color: scope.pillColour
-                Row {
+                MaterialIcon {
                     anchors.centerIn: parent
-                    spacing: 7
-                    MaterialIcon {
-                        text: Nmcli.activeEthernet ? "lan" : Nmcli.active ? "wifi" : "wifi_off"
-                        color: Colours.palette.m3primary
-                    }
-                    Text {
-                        text: Nmcli.activeEthernet ? "Ethernet" : Nmcli.active ? Nmcli.active.ssid : "Offline"
-                        color: scope.inkColour
-                        font.pixelSize: 12
-                        width: Math.min(100, implicitWidth)
-                        elide: Text.ElideRight
-                    }
+                    text: Nmcli.activeEthernet ? "cable" : Nmcli.active ? "wifi" : "wifi_off"
+                    color: scope.networkAccent
                 }
                 MouseArea {
                     anchors.fill: parent
@@ -335,7 +336,7 @@ Variants {
                 MaterialIcon {
                     anchors.centerIn: parent
                     text: Notifs.dnd ? "notifications_off" : "notifications"
-                    color: scope.inkColour
+                    color: scope.bellAccent
                 }
                 MouseArea {
                     anchors.fill: parent
@@ -378,10 +379,9 @@ Variants {
                         model: ScriptModel {
                             values: scope.trayEntries
                         }
-                        TrayItem {
+                        TopTrayItem {
                             width: 26
                             height: 26
-                            nativeMenuOnRightClick: true
                         }
                     }
                 }
@@ -408,7 +408,7 @@ Variants {
                 MaterialIcon {
                     anchors.centerIn: parent
                     text: "bluetooth"
-                    color: Colours.palette.m3primary
+                    color: scope.bluetoothAccent
                 }
 
                 MouseArea {
@@ -439,7 +439,7 @@ Variants {
                 MaterialIcon {
                     anchors.centerIn: parent
                     text: "power_settings_new"
-                    color: Colours.palette.m3error
+                    color: scope.powerAccent
                 }
 
                 MouseArea {
