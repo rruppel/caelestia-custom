@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 // Experimental horizontal bar: three independent layer-shell windows.
 // The original drawers and their popouts are intentionally left untouched.
+import "components"
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
@@ -48,12 +49,8 @@ Variants {
                 anchors.fill: parent
                 radius: height / 2
                 color: scope.pillColour
-                Text {
+                OsIcon {
                     anchors.centerIn: parent
-                    text: "A"
-                    font.pixelSize: 17
-                    font.weight: Font.Bold
-                    color: Colours.palette.m3primary
                 }
             }
         }
