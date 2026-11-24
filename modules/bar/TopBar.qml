@@ -52,6 +52,19 @@ Variants {
         readonly property int afterNetwork: afterBattery + netWidth + gap
         readonly property int afterBluetooth: afterNetwork + bluetoothWidth + gap
         readonly property int afterAudio: afterBluetooth + soundWidth + gap
+        // Show only the minimized windows in special:magic; hide when empty.
+        readonly property var scratchWindows: Hypr.toplevels.values.filter(t =>
+            t.workspace?.name === "special:magic" && t.lastIpcObject?.mapped)
+        readonly property int scratchWidth: scratchWindows.length > 0 ? 14 + scratchWindows.length * 28 : 0
+
+        function restoreScratchWindow(address: string): void {
+            const targetWorkspace = Hypr.activeWsId;
+            if (!address || targetWorkspace < 1)
+                return;
+            Hypr.dispatch(`movetoworkspacesilent ${targetWorkspace},address:${address}`);
+            Hypr.dispatch(`focuswindow address:${address}`);
+        }
+
         // Manual snap selector: clicking this capsule never changes normal window dragging.
         Process {
             id: openSnapZones
@@ -456,6 +469,63 @@ Variants {
                         const state = ShellState.forScreen(scope.modelData);
                         if (state)
                             state.session = !state.session;
+                    }
+                }
+            }
+        }
+
+        // Icons of windows parked in special:magic by the yellow Hyprbars button.
+        // Click an icon to restore ONLY that window to the currently active desktop.
+        StyledWindow {
+            name: "topbar-scratchpad"
+            screen: scope.modelData
+            visible: scope.scratchWindows.length > 0
+            anchors.top: true
+            anchors.right: true
+            margins.top: scope.edgeGap
+            margins.right: scope.afterAudio + scope.traySpace + 2 * (34 + scope.gap)
+            implicitWidth: Math.max(1, scope.scratchWidth)
+            implicitHeight: scope.pillHeight
+            WlrLayershell.exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.layer: WlrLayer.Overlay
+
+            Rectangle {
+                anchors.fill: parent
+                radius: height / 2
+                color: scope.pillColour
+
+                Row {
+                    anchors.centerIn: parent
+                    spacing: 2
+
+                    Repeater {
+                        model: ScriptModel { values: scope.scratchWindows }
+
+                        Item {
+                            id: scratchItem
+                            required property var modelData
+                            width: 26
+                            height: 26
+                            readonly property string address: modelData.lastIpcObject?.address ?? ""
+                            readonly property string appClass: modelData.lastIpcObject?.class ?? ""
+                            readonly property string appTitle: modelData.lastIpcObject?.title ?? appClass
+
+                            Image {
+                                anchors.centerIn: parent
+                                width: 21
+                                height: 21
+                                source: Quickshell.iconPath(scratchItem.appClass, "application-x-executable")
+                                fillMode: Image.PreserveAspectFit
+                                smooth: true
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                hoverEnabled: true
+                                onClicked: scope.restoreScratchWindow(scratchItem.address)
+                            }
+                        }
                     }
                 }
             }
