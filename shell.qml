@@ -10,7 +10,7 @@ import "modules/drawers"
 import "modules/background"
 import "modules/bar"
 import "modules/reflection"
-import "modules/system-monitor"
+import "modules/systemMonitor"
 import "modules/areapicker"
 import "modules/lock"
 import QtQuick
