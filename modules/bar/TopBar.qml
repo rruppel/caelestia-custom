@@ -625,10 +625,10 @@ Variants {
             name: "topbar-recorder"
             screen: scope.modelData
             anchors.top: true
-            anchors.right: true
+            anchors.left: true
             margins.top: scope.edgeGap
-            // Directly left of Shuffle, with 8px between capsules.
-            margins.right: scope.afterAudio + scope.traySpace + 2 * (34 + scope.gap)
+            // Immediately after Thunar in the left-hand group.
+            margins.left: scope.leftInset + scope.logoWidth + scope.clockWidth + scope.alertsWidth + 4 * scope.gap + 34
             implicitWidth: 34
             implicitHeight: scope.pillHeight
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
