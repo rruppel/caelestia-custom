@@ -18,18 +18,18 @@ Variants {
         id: scope
         required property ShellScreen modelData
 
-        readonly property int edgeGap: 8
-        readonly property int gap: 6
-        readonly property int alertsWidth: 43
-        readonly property int clockWidth: 108
-        readonly property int logoWidth: 30
-        readonly property int netWidth: 142
-        readonly property int soundWidth: 93
-        readonly property int bellWidth: 30
-        readonly property int batteryWidth: 66
+        readonly property int edgeGap: 12
+        readonly property int gap: 8
+        readonly property int alertsWidth: 52
+        readonly property int clockWidth: 112
+        readonly property int logoWidth: 34
+        readonly property int netWidth: 150
+        readonly property int soundWidth: 94
+        readonly property int bellWidth: 34
+        readonly property int batteryWidth: 72
         readonly property bool hasBattery: UPower.displayDevice.isLaptopBattery
-        readonly property int pillHeight: 29
-        readonly property color pillColour: Qt.alpha(Colours.tPalette.m3surfaceContainer, 0.93)
+        readonly property int pillHeight: 34
+        readonly property color pillColour: Qt.alpha(Colours.tPalette.m3surfaceContainer, 0.94)
         readonly property color inkColour: Colours.palette.m3onSurface
 
 
@@ -48,9 +48,11 @@ Variants {
                 anchors.fill: parent
                 radius: height / 2
                 color: scope.pillColour
-                MaterialIcon {
+                Text {
                     anchors.centerIn: parent
-                    text: "terminal"
+                    text: "A"
+                    font.pixelSize: 17
+                    font.weight: Font.Bold
                     color: Colours.palette.m3primary
                 }
             }
@@ -81,7 +83,7 @@ Variants {
                     Text {
                         text: Time.format("hh:mm AP")
                         color: scope.inkColour
-                        font.pixelSize: 11
+                        font.pixelSize: 12
                     }
                 }
             }
@@ -106,13 +108,13 @@ Variants {
                     anchors.centerIn: parent
                     spacing: 4
                     MaterialIcon {
-                        text: "warning"
+                        text: "notifications_active"
                         color: Colours.palette.m3error
                     }
                     Text {
                         text: Notifs.notClosed.length
                         color: scope.inkColour
-                        font.pixelSize: 11
+                        font.pixelSize: 12
                     }
                 }
             }
@@ -126,7 +128,7 @@ Variants {
             anchors.left: true
             margins.top: scope.edgeGap
             margins.left: Math.round((scope.modelData.width - implicitWidth) / 2)
-            implicitWidth: Math.max(132, Config.bar.workspaces.shown * 27 + 12)
+            implicitWidth: Math.max(148, Config.bar.workspaces.shown * 30 + 16)
             implicitHeight: scope.pillHeight
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             WlrLayershell.layer: WlrLayer.Overlay
@@ -139,7 +141,7 @@ Variants {
 
                 Row {
                     anchors.centerIn: parent
-                    spacing: 3
+                    spacing: 5
 
                     Repeater {
                         model: Config.bar.workspaces.shown
@@ -149,16 +151,16 @@ Variants {
                             readonly property int groupStart: Math.floor((Hypr.activeWsId - 1) / Config.bar.workspaces.shown) * Config.bar.workspaces.shown
                             readonly property int workspaceId: groupStart + index + 1
                             readonly property bool active: Hypr.activeWsId === workspaceId
-                            width: 24
-                            height: 23
-                            radius: 12
+                            width: 25
+                            height: 25
+                            radius: 13
                             color: active ? Colours.palette.m3primary : "transparent"
 
                             Text {
                                 anchors.centerIn: parent
                                 text: parent.active ? parent.workspaceId : "·"
                                 color: parent.active ? Colours.palette.m3onPrimary : scope.inkColour
-                                font.pixelSize: 11
+                                font.pixelSize: 12
                                 font.weight: parent.active ? Font.DemiBold : Font.Normal
                             }
 
@@ -203,7 +205,7 @@ Variants {
                     Text {
                         text: Math.round(Audio.volume * 100) + "%"
                         color: scope.inkColour
-                        font.pixelSize: 11
+                        font.pixelSize: 12
                     }
                 }
                 MouseArea {
@@ -249,7 +251,7 @@ Variants {
                     Text {
                         text: Nmcli.activeEthernet ? "Ethernet" : Nmcli.active ? Nmcli.active.ssid : "Offline"
                         color: scope.inkColour
-                        font.pixelSize: 11
+                        font.pixelSize: 12
                         width: Math.min(100, implicitWidth)
                         elide: Text.ElideRight
                     }
@@ -283,7 +285,7 @@ Variants {
                     Text {
                         text: Math.round(UPower.displayDevice.percentage * 100) + "%"
                         color: scope.inkColour
-                        font.pixelSize: 11
+                        font.pixelSize: 12
                     }
                 }
             }
