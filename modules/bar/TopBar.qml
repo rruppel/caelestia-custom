@@ -576,6 +576,86 @@ Variants {
             }
         }
 
+        // One-click screen recording. The Python helper starts a detached
+        // wf-recorder process, so a Caelestia restart does not interrupt a video.
+        property bool recordingActive: false
+        readonly property string recorderScript: Quickshell.env("HOME") +
+            "/.config/quickshell/caelestia/scripts/screen-record-toggle.py"
+
+        Process {
+            id: recorderToggle
+            command: ["/usr/bin/python3", scope.recorderScript, "toggle"]
+            stdout: StdioCollector {
+                onStreamFinished: {
+                    const state = text.trim();
+                    if (state === "recording")
+                        scope.recordingActive = true;
+                    else if (state === "idle")
+                        scope.recordingActive = false;
+                }
+            }
+            stderr: StdioCollector {
+                onStreamFinished: {
+                    if (text.trim())
+                        console.warn("Caelestia recorder:", text.trim());
+                }
+            }
+        }
+
+        Process {
+            id: recorderStatus
+            command: ["/usr/bin/python3", scope.recorderScript, "status"]
+            stdout: StdioCollector {
+                onStreamFinished: scope.recordingActive = text.trim() === "recording"
+            }
+        }
+
+        Timer {
+            interval: 1000
+            running: true
+            repeat: true
+            triggeredOnStart: true
+            onTriggered: {
+                if (!recorderStatus.running && !recorderToggle.running)
+                    recorderStatus.running = true;
+            }
+        }
+
+        StyledWindow {
+            name: "topbar-recorder"
+            screen: scope.modelData
+            anchors.top: true
+            anchors.right: true
+            margins.top: scope.edgeGap
+            // Directly left of Shuffle, with 8px between capsules.
+            margins.right: scope.afterAudio + scope.traySpace + 2 * (34 + scope.gap)
+            implicitWidth: 34
+            implicitHeight: scope.pillHeight
+            WlrLayershell.exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.layer: WlrLayer.Overlay
+
+            Rectangle {
+                anchors.fill: parent
+                radius: height / 2
+                color: scope.pillColour
+
+                MaterialIcon {
+                    anchors.centerIn: parent
+                    text: scope.recordingActive ? "stop_circle" : "radio_button_checked"
+                    color: scope.recordingActive ? "#FF5F57" : scope.inkColour
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        if (!recorderToggle.running)
+                            recorderToggle.running = true;
+                    }
+                }
+            }
+        }
+
         // Switch to a random wallpaper from the user's collection on demand.
         // No background polling: this process runs only when the capsule is clicked.
         Process {
