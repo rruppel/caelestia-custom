@@ -25,15 +25,13 @@ MouseArea {
         console.info("TopBar tray clicked:", modelData.id, "button:", event.button,
                      "menu:", modelData.hasMenu, "onlyMenu:", modelData.onlyMenu);
 
-        if (event.button === Qt.MiddleButton) {
-            modelData.secondaryActivate();
-        } else if (event.button === Qt.RightButton || modelData.onlyMenu) {
+        if (event.button === Qt.LeftButton) {
             if (modelData.hasMenu)
                 menuAnchor.open();
             else
-                modelData.secondaryActivate();
-        } else {
-            modelData.activate();
+                modelData.activate();
+        } else if (event.button === Qt.RightButton || event.button === Qt.MiddleButton) {
+            modelData.secondaryActivate();
         }
     }
 
