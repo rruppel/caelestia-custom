@@ -11,6 +11,7 @@ import Caelestia.Config
 import qs.components
 import qs.components.containers
 import qs.services
+import qs.modules.nexus
 
 Variants {
     model: Screens.screens
@@ -109,6 +110,15 @@ Variants {
                         font.pixelSize: 12
                     }
                 }
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        const s = ShellState.forScreen(scope.modelData);
+                        if (s)
+                            s.sidebar = !s.sidebar;
+                    }
+                }
             }
         }
 
@@ -162,6 +172,12 @@ Variants {
                                 onClicked: Hypr.dispatch(Hypr.usingLua
                                     ? `hl.dsp.focus({ workspace = "${parent.workspaceId}" })`
                                     : `workspace ${parent.workspaceId}`)
+                                onWheel: event => {
+                                    const direction = event.angleDelta.y > 0 ? "-" : "+";
+                                    Hypr.dispatch(Hypr.usingLua
+                                        ? `hl.dsp.focus({ workspace = "r${direction}1" })`
+                                        : `workspace r${direction}1`);
+                                }
                             }
                         }
                     }
@@ -202,10 +218,14 @@ Variants {
                 }
                 MouseArea {
                     anchors.fill: parent
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        if (Audio.sink?.audio)
+                    onClicked: event => {
+                        if (event.button === Qt.RightButton) {
+                            WindowFactory.createPage(3);
+                        } else if (Audio.sink?.audio) {
                             Audio.sink.audio.muted = !Audio.sink.audio.muted;
+                        }
                     }
                     onWheel: event => {
                         if (event.angleDelta.y > 0)
@@ -247,6 +267,11 @@ Variants {
                         width: Math.min(100, implicitWidth)
                         elide: Text.ElideRight
                     }
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: WindowFactory.createPage(1)
                 }
             }
         }
@@ -306,7 +331,12 @@ Variants {
                 MouseArea {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: Notifs.dnd = !Notifs.dnd
+                    onClicked: {
+                        const s = ShellState.forScreen(scope.modelData);
+                        if (s)
+                            s.sidebar = !s.sidebar;
+                    }
+                    onPressAndHold: Notifs.dnd = !Notifs.dnd
                 }
             }
         }
