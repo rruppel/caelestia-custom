@@ -52,7 +52,6 @@ Variants {
                     anchors.centerIn: parent
                     text: "terminal"
                     color: Colours.palette.m3primary
-                    font.pixelSize: 17
                 }
             }
         }
@@ -78,7 +77,6 @@ Variants {
                     MaterialIcon {
                         text: "schedule"
                         color: Colours.palette.m3primary
-                        font.pixelSize: 14
                     }
                     Text {
                         text: Time.format("hh:mm AP")
@@ -110,7 +108,6 @@ Variants {
                     MaterialIcon {
                         text: "warning"
                         color: Colours.palette.m3error
-                        font.pixelSize: 14
                     }
                     Text {
                         text: Notifs.notClosed.length
@@ -202,7 +199,6 @@ Variants {
                     MaterialIcon {
                         text: Audio.muted ? "volume_off" : "headphones"
                         color: Colours.palette.m3primary
-                        font.pixelSize: 15
                     }
                     Text {
                         text: Math.round(Audio.volume * 100) + "%"
@@ -249,7 +245,6 @@ Variants {
                     MaterialIcon {
                         text: Nmcli.activeEthernet ? "lan" : Nmcli.active ? "wifi" : "wifi_off"
                         color: Colours.palette.m3primary
-                        font.pixelSize: 16
                     }
                     Text {
                         text: Nmcli.activeEthernet ? "Ethernet" : Nmcli.active ? Nmcli.active.ssid : "Offline"
@@ -284,7 +279,6 @@ Variants {
                     MaterialIcon {
                         text: "battery_full"
                         color: Colours.palette.m3primary
-                        font.pixelSize: 15
                     }
                     Text {
                         text: Math.round(UPower.displayDevice.percentage * 100) + "%"
@@ -314,7 +308,6 @@ Variants {
                     anchors.centerIn: parent
                     text: Notifs.dnd ? "notifications_off" : "notifications"
                     color: scope.inkColour
-                    font.pixelSize: 16
                 }
                 MouseArea {
                     anchors.fill: parent
