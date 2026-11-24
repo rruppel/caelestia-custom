@@ -5,7 +5,9 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.Services.UPower
 import Caelestia.Config
+import qs.components
 import qs.components.containers
 import qs.services
 
@@ -16,10 +18,44 @@ Variants {
         id: scope
         required property ShellScreen modelData
 
-        readonly property int edgeGap: 14
-        readonly property int pillHeight: 36
-        readonly property color pillColour: Colours.tPalette.m3surfaceContainer
+        readonly property int edgeGap: 8
+        readonly property int gap: 6
+        readonly property int alertsWidth: 43
+        readonly property int clockWidth: 108
+        readonly property int logoWidth: 30
+        readonly property int netWidth: 142
+        readonly property int soundWidth: 93
+        readonly property int bellWidth: 30
+        readonly property int batteryWidth: 66
+        readonly property bool hasBattery: UPower.displayDevice.isLaptopBattery
+        readonly property int pillHeight: 29
+        readonly property color pillColour: Qt.alpha(Colours.tPalette.m3surfaceContainer, 0.93)
         readonly property color inkColour: Colours.palette.m3onSurface
+
+
+        StyledWindow {
+            name: "topbar-logo"
+            screen: scope.modelData
+            anchors.top: true
+            anchors.left: true
+            margins.top: scope.edgeGap
+            margins.left: scope.edgeGap
+            implicitWidth: scope.logoWidth
+            implicitHeight: scope.pillHeight
+            WlrLayershell.exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.layer: WlrLayer.Overlay
+            Rectangle {
+                anchors.fill: parent
+                radius: height / 2
+                color: scope.pillColour
+                MaterialIcon {
+                    anchors.centerIn: parent
+                    text: "terminal"
+                    color: Colours.palette.m3primary
+                    font.pixelSize: 17
+                }
+            }
+        }
 
         StyledWindow {
             name: "topbar-clock"
@@ -27,24 +63,60 @@ Variants {
             anchors.top: true
             anchors.left: true
             margins.top: scope.edgeGap
-            margins.left: scope.edgeGap
-            implicitWidth: 165
+            margins.left: scope.edgeGap + scope.logoWidth + scope.gap
+            implicitWidth: scope.clockWidth
             implicitHeight: scope.pillHeight
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             WlrLayershell.layer: WlrLayer.Overlay
-            WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-
             Rectangle {
                 anchors.fill: parent
                 radius: height / 2
                 color: scope.pillColour
-
-                Text {
+                Row {
                     anchors.centerIn: parent
-                    color: scope.inkColour
-                    font.pixelSize: 13
-                    font.weight: Font.Medium
-                    text: Time.format("ddd d MMM  HH:mm")
+                    spacing: 5
+                    MaterialIcon {
+                        text: "schedule"
+                        color: Colours.palette.m3primary
+                        font.pixelSize: 14
+                    }
+                    Text {
+                        text: Time.format("hh:mm AP")
+                        color: scope.inkColour
+                        font.pixelSize: 11
+                    }
+                }
+            }
+        }
+
+        StyledWindow {
+            name: "topbar-alerts"
+            screen: scope.modelData
+            anchors.top: true
+            anchors.left: true
+            margins.top: scope.edgeGap
+            margins.left: scope.edgeGap + scope.logoWidth + scope.clockWidth + 2 * scope.gap
+            implicitWidth: scope.alertsWidth
+            implicitHeight: scope.pillHeight
+            WlrLayershell.exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.layer: WlrLayer.Overlay
+            Rectangle {
+                anchors.fill: parent
+                radius: height / 2
+                color: scope.pillColour
+                Row {
+                    anchors.centerIn: parent
+                    spacing: 4
+                    MaterialIcon {
+                        text: "warning"
+                        color: Colours.palette.m3error
+                        font.pixelSize: 14
+                    }
+                    Text {
+                        text: Notifs.notClosed.length
+                        color: scope.inkColour
+                        font.pixelSize: 11
+                    }
                 }
             }
         }
@@ -57,7 +129,7 @@ Variants {
             anchors.left: true
             margins.top: scope.edgeGap
             margins.left: Math.round((scope.modelData.width - implicitWidth) / 2)
-            implicitWidth: Math.max(140, Config.bar.workspaces.shown * 33 + 20)
+            implicitWidth: Math.max(132, Config.bar.workspaces.shown * 27 + 12)
             implicitHeight: scope.pillHeight
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             WlrLayershell.layer: WlrLayer.Overlay
@@ -70,7 +142,7 @@ Variants {
 
                 Row {
                     anchors.centerIn: parent
-                    spacing: 5
+                    spacing: 3
 
                     Repeater {
                         model: Config.bar.workspaces.shown
@@ -80,16 +152,16 @@ Variants {
                             readonly property int groupStart: Math.floor((Hypr.activeWsId - 1) / Config.bar.workspaces.shown) * Config.bar.workspaces.shown
                             readonly property int workspaceId: groupStart + index + 1
                             readonly property bool active: Hypr.activeWsId === workspaceId
-                            width: 28
-                            height: 26
-                            radius: 13
+                            width: 24
+                            height: 23
+                            radius: 12
                             color: active ? Colours.palette.m3primary : "transparent"
 
                             Text {
                                 anchors.centerIn: parent
-                                text: parent.workspaceId
+                                text: parent.active ? parent.workspaceId : "·"
                                 color: parent.active ? Colours.palette.m3onPrimary : scope.inkColour
-                                font.pixelSize: 12
+                                font.pixelSize: 11
                                 font.weight: parent.active ? Font.DemiBold : Font.Normal
                             }
 
@@ -106,61 +178,148 @@ Variants {
             }
         }
 
+
         StyledWindow {
-            name: "topbar-status"
+            name: "topbar-audio"
+            screen: scope.modelData
+            anchors.top: true
+            anchors.right: true
+            margins.top: scope.edgeGap
+            margins.right: scope.edgeGap + scope.bellWidth + scope.gap
+                + (scope.hasBattery ? scope.batteryWidth + scope.gap : 0)
+                + scope.netWidth + scope.gap
+            implicitWidth: scope.soundWidth
+            implicitHeight: scope.pillHeight
+            WlrLayershell.exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.layer: WlrLayer.Overlay
+            Rectangle {
+                anchors.fill: parent
+                radius: height / 2
+                color: scope.pillColour
+                Row {
+                    anchors.centerIn: parent
+                    spacing: 6
+                    MaterialIcon {
+                        text: Audio.muted ? "volume_off" : "headphones"
+                        color: Colours.palette.m3primary
+                        font.pixelSize: 15
+                    }
+                    Text {
+                        text: Math.round(Audio.volume * 100) + "%"
+                        color: scope.inkColour
+                        font.pixelSize: 11
+                    }
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        if (Audio.sink?.audio)
+                            Audio.sink.audio.muted = !Audio.sink.audio.muted;
+                    }
+                    onWheel: event => {
+                        if (event.angleDelta.y > 0)
+                            Audio.incrementVolume();
+                        else if (event.angleDelta.y < 0)
+                            Audio.decrementVolume();
+                    }
+                }
+            }
+        }
+
+        StyledWindow {
+            name: "topbar-network"
+            screen: scope.modelData
+            anchors.top: true
+            anchors.right: true
+            margins.top: scope.edgeGap
+            margins.right: scope.edgeGap + scope.bellWidth + scope.gap
+                + (scope.hasBattery ? scope.batteryWidth + scope.gap : 0)
+            implicitWidth: scope.netWidth
+            implicitHeight: scope.pillHeight
+            WlrLayershell.exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.layer: WlrLayer.Overlay
+            Rectangle {
+                anchors.fill: parent
+                radius: height / 2
+                color: scope.pillColour
+                Row {
+                    anchors.centerIn: parent
+                    spacing: 7
+                    MaterialIcon {
+                        text: Nmcli.activeEthernet ? "lan" : Nmcli.active ? "wifi" : "wifi_off"
+                        color: Colours.palette.m3primary
+                        font.pixelSize: 16
+                    }
+                    Text {
+                        text: Nmcli.activeEthernet ? "Ethernet" : Nmcli.active ? Nmcli.active.ssid : "Offline"
+                        color: scope.inkColour
+                        font.pixelSize: 11
+                        width: Math.min(100, implicitWidth)
+                        elide: Text.ElideRight
+                    }
+                }
+            }
+        }
+
+        StyledWindow {
+            name: "topbar-battery"
+            screen: scope.modelData
+            visible: scope.hasBattery
+            anchors.top: true
+            anchors.right: true
+            margins.top: scope.edgeGap
+            margins.right: scope.edgeGap + scope.bellWidth + scope.gap
+            implicitWidth: scope.batteryWidth
+            implicitHeight: scope.pillHeight
+            WlrLayershell.exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.layer: WlrLayer.Overlay
+            Rectangle {
+                anchors.fill: parent
+                radius: height / 2
+                color: scope.pillColour
+                Row {
+                    anchors.centerIn: parent
+                    spacing: 4
+                    MaterialIcon {
+                        text: "battery_full"
+                        color: Colours.palette.m3primary
+                        font.pixelSize: 15
+                    }
+                    Text {
+                        text: Math.round(UPower.displayDevice.percentage * 100) + "%"
+                        color: scope.inkColour
+                        font.pixelSize: 11
+                    }
+                }
+            }
+        }
+
+        StyledWindow {
+            name: "topbar-notifications"
             screen: scope.modelData
             anchors.top: true
             anchors.right: true
             margins.top: scope.edgeGap
             margins.right: scope.edgeGap
-            implicitWidth: 122
+            implicitWidth: scope.bellWidth
             implicitHeight: scope.pillHeight
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             WlrLayershell.layer: WlrLayer.Overlay
-            WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-
             Rectangle {
                 anchors.fill: parent
                 radius: height / 2
                 color: scope.pillColour
-
-                Row {
+                MaterialIcon {
                     anchors.centerIn: parent
-                    spacing: 12
-
-                    Text {
-                        text: Audio.muted ? "󰝟" : "󰕾"
-                        color: scope.inkColour
-                        font.pixelSize: 16
-
-                        MouseArea {
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                if (Audio.sink?.audio)
-                                    Audio.sink.audio.muted = !Audio.sink.audio.muted;
-                            }
-                            onWheel: event => {
-                                if (event.angleDelta.y > 0)
-                                    Audio.incrementVolume();
-                                else if (event.angleDelta.y < 0)
-                                    Audio.decrementVolume();
-                            }
-                        }
-                    }
-
-                    Text {
-                        text: Math.round(Audio.volume * 100) + "%"
-                        color: scope.inkColour
-                        font.pixelSize: 12
-                    }
-
-                    Text {
-                        text: Nmcli.activeEthernet ? "󰈀" : Nmcli.active ? "󰖩" : "󰖪"
-                        color: scope.inkColour
-                        font.pixelSize: 16
-                    }
+                    text: Notifs.dnd ? "notifications_off" : "notifications"
+                    color: scope.inkColour
+                    font.pixelSize: 16
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: Notifs.dnd = !Notifs.dnd
                 }
             }
         }
