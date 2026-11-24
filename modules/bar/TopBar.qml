@@ -20,6 +20,7 @@ Variants {
         required property ShellScreen modelData
 
         readonly property int edgeGap: 12
+        readonly property int leftInset: 24
         readonly property int gap: 8
         readonly property int alertsWidth: 52
         readonly property int clockWidth: 165
@@ -40,7 +41,7 @@ Variants {
             anchors.top: true
             anchors.left: true
             margins.top: scope.edgeGap
-            margins.left: scope.edgeGap
+            margins.left: scope.leftInset
             implicitWidth: scope.logoWidth
             implicitHeight: scope.pillHeight
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
@@ -61,7 +62,7 @@ Variants {
             anchors.top: true
             anchors.left: true
             margins.top: scope.edgeGap
-            margins.left: scope.edgeGap + scope.logoWidth + scope.gap
+            margins.left: scope.leftInset + scope.logoWidth + scope.gap
             implicitWidth: scope.clockWidth
             implicitHeight: scope.pillHeight
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
@@ -86,7 +87,7 @@ Variants {
             anchors.top: true
             anchors.left: true
             margins.top: scope.edgeGap
-            margins.left: scope.edgeGap + scope.logoWidth + scope.clockWidth + 2 * scope.gap
+            margins.left: scope.leftInset + scope.logoWidth + scope.clockWidth + 2 * scope.gap
             implicitWidth: scope.alertsWidth
             implicitHeight: scope.pillHeight
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
