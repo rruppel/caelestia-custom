@@ -14,6 +14,11 @@ Singleton {
         nexusComp.createObject(parent ?? dummy, props);
     }
 
+    // Open a specific Nexus page without changing the default launcher behavior.
+    function createPage(pageIndex: int): void {
+        create(null, { "initialPage": pageIndex });
+    }
+
     QtObject {
         id: dummy
     }
@@ -23,6 +28,7 @@ Singleton {
 
         FloatingWindow {
             id: win
+            property int initialPage: 0
 
             color: Colours.tPalette.m3surface
             surfaceFormat.opaque: false
@@ -49,6 +55,7 @@ Singleton {
                 anchors.fill: parent
                 nState.screen: win.screen
                 nState.isWindow: true
+                nState.currentPageIdx: win.initialPage
                 onClose: win.destroy()
             }
 
