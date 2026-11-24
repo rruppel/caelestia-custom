@@ -5,6 +5,7 @@ import "components"
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.Io
 import Quickshell.Services.UPower
 import Quickshell.Services.SystemTray
 import Caelestia.Config
@@ -51,6 +52,12 @@ Variants {
         readonly property int afterNetwork: afterBattery + netWidth + gap
         readonly property int afterBluetooth: afterNetwork + bluetoothWidth + gap
         readonly property int afterAudio: afterBluetooth + soundWidth + gap
+        // Manual snap selector: clicking this capsule never changes normal window dragging.
+        Process {
+            id: openSnapZones
+            command: ["/usr/bin/qs", "-c", "caelestia", "ipc", "call", "snapzones", "toggle"]
+        }
+
 
 
         StyledWindow {
@@ -449,6 +456,41 @@ Variants {
                         const state = ShellState.forScreen(scope.modelData);
                         if (state)
                             state.session = !state.session;
+                    }
+                }
+            }
+        }
+
+        StyledWindow {
+            name: "topbar-snapzones"
+            screen: scope.modelData
+            anchors.top: true
+            anchors.right: true
+            margins.top: scope.edgeGap
+            // Put the snap button just to the left of the system tray, if present.
+            margins.right: scope.afterAudio + scope.traySpace
+            implicitWidth: 34
+            implicitHeight: scope.pillHeight
+            WlrLayershell.exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.layer: WlrLayer.Overlay
+
+            Rectangle {
+                anchors.fill: parent
+                radius: height / 2
+                color: scope.pillColour
+
+                MaterialIcon {
+                    anchors.centerIn: parent
+                    text: "grid_view"
+                    color: scope.networkAccent
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        if (!openSnapZones.running)
+                            openSnapZones.running = true;
                     }
                 }
             }
