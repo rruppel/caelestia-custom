@@ -34,8 +34,13 @@ def main():
     mh = round(monitor["height"] / scale)
     # Hyprland's reserved: top, bottom, left, right.
     top, bottom, left, right = monitor.get("reserved", [0, 0, 0, 0])
-    x0, y0 = mx + left, my + top
-    usable_w, usable_h = mw - left - right, mh - top - bottom
+    # Floating TopBar does not reserve compositor space. Its pills begin at
+    # y=12 and are 34px high; keep another 20px of clear space underneath.
+    # Honour larger compositor reservations when present.
+    topbar_clearance = 12 + 34 + 20
+    effective_top = max(top, topbar_clearance)
+    x0, y0 = mx + left, my + effective_top
+    usable_w, usable_h = mw - left - right, mh - effective_top - bottom
     col, row = zone % 3, zone // 3
     margin, spacing = 12, 12
     usable_w -= 2 * margin
