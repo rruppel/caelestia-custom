@@ -464,7 +464,7 @@ Variants {
         // Caelestia Control Center shortcut; keep it separate from system settings.
         Process {
             id: openCaelestiaSettings
-            command: ["/home/rruppel/.local/bin/caelestia", "shell", "controlCenter", "open"]
+            command: [Quickshell.env("HOME") + "/.local/bin/caelestia", "shell", "controlCenter", "open"]
         }
 
         StyledWindow {
