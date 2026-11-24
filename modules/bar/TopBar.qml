@@ -7,6 +7,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Services.UPower
+import Quickshell.Services.SystemTray
 import Caelestia.Config
 import qs.components
 import qs.components.containers
@@ -34,6 +35,17 @@ Variants {
         readonly property int pillHeight: 34
         readonly property color pillColour: Qt.alpha(Colours.tPalette.m3surfaceContainer, 0.94)
         readonly property color inkColour: Colours.palette.m3onSurface
+        readonly property int powerWidth: 34
+        readonly property int bluetoothWidth: 34
+        readonly property var trayEntries: SystemTray.items.values.filter(i => !GlobalConfig.bar.tray.hiddenIcons.includes(i.id))
+        readonly property int trayWidth: trayEntries.length > 0 ? 14 + trayEntries.length * 26 : 0
+        readonly property int traySpace: trayEntries.length > 0 ? trayWidth + gap : 0
+        readonly property int afterPower: edgeGap + powerWidth + gap
+        readonly property int afterBell: afterPower + bellWidth + gap
+        readonly property int afterBattery: afterBell + (hasBattery ? batteryWidth + gap : 0)
+        readonly property int afterNetwork: afterBattery + netWidth + gap
+        readonly property int afterBluetooth: afterNetwork + bluetoothWidth + gap
+        readonly property int afterAudio: afterBluetooth + soundWidth + gap
 
 
         StyledWindow {
@@ -192,9 +204,7 @@ Variants {
             anchors.top: true
             anchors.right: true
             margins.top: scope.edgeGap
-            margins.right: scope.edgeGap + scope.bellWidth + scope.gap
-                + (scope.hasBattery ? scope.batteryWidth + scope.gap : 0)
-                + scope.netWidth + scope.gap
+            margins.right: scope.afterBluetooth
             implicitWidth: scope.soundWidth
             implicitHeight: scope.pillHeight
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
@@ -243,8 +253,7 @@ Variants {
             anchors.top: true
             anchors.right: true
             margins.top: scope.edgeGap
-            margins.right: scope.edgeGap + scope.bellWidth + scope.gap
-                + (scope.hasBattery ? scope.batteryWidth + scope.gap : 0)
+            margins.right: scope.afterBattery
             implicitWidth: scope.netWidth
             implicitHeight: scope.pillHeight
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
@@ -283,7 +292,7 @@ Variants {
             anchors.top: true
             anchors.right: true
             margins.top: scope.edgeGap
-            margins.right: scope.edgeGap + scope.bellWidth + scope.gap
+            margins.right: scope.afterBell
             implicitWidth: scope.batteryWidth
             implicitHeight: scope.pillHeight
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
@@ -314,7 +323,7 @@ Variants {
             anchors.top: true
             anchors.right: true
             margins.top: scope.edgeGap
-            margins.right: scope.edgeGap
+            margins.right: scope.afterPower
             implicitWidth: scope.bellWidth
             implicitHeight: scope.pillHeight
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
@@ -337,6 +346,109 @@ Variants {
                             s.sidebar = !s.sidebar;
                     }
                     onPressAndHold: Notifs.dnd = !Notifs.dnd
+                }
+            }
+        }
+
+        // Keep the original system-tray actions (left click / secondary click).
+        // A separate pill avoids changing the existing vertical tray implementation.
+        StyledWindow {
+            name: "topbar-tray"
+            screen: scope.modelData
+            visible: scope.trayEntries.length > 0
+            anchors.top: true
+            anchors.right: true
+            margins.top: scope.edgeGap
+            margins.right: scope.afterAudio
+            implicitWidth: Math.max(1, scope.trayWidth)
+            implicitHeight: scope.pillHeight
+            WlrLayershell.exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.layer: WlrLayer.Overlay
+
+            Rectangle {
+                anchors.fill: parent
+                radius: height / 2
+                color: scope.pillColour
+
+                Row {
+                    anchors.centerIn: parent
+                    spacing: 0
+
+                    Repeater {
+                        model: ScriptModel {
+                            values: scope.trayEntries
+                        }
+                        TrayItem {
+                            width: 26
+                            height: 26
+                        }
+                    }
+                }
+            }
+        }
+
+        StyledWindow {
+            name: "topbar-bluetooth"
+            screen: scope.modelData
+            anchors.top: true
+            anchors.right: true
+            margins.top: scope.edgeGap
+            margins.right: scope.afterNetwork
+            implicitWidth: scope.bluetoothWidth
+            implicitHeight: scope.pillHeight
+            WlrLayershell.exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.layer: WlrLayer.Overlay
+
+            Rectangle {
+                anchors.fill: parent
+                radius: height / 2
+                color: scope.pillColour
+
+                MaterialIcon {
+                    anchors.centerIn: parent
+                    text: "bluetooth"
+                    color: Colours.palette.m3primary
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: WindowFactory.createPage(2)
+                }
+            }
+        }
+
+        StyledWindow {
+            name: "topbar-power"
+            screen: scope.modelData
+            anchors.top: true
+            anchors.right: true
+            margins.top: scope.edgeGap
+            margins.right: scope.edgeGap
+            implicitWidth: scope.powerWidth
+            implicitHeight: scope.pillHeight
+            WlrLayershell.exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.layer: WlrLayer.Overlay
+
+            Rectangle {
+                anchors.fill: parent
+                radius: height / 2
+                color: scope.pillColour
+
+                MaterialIcon {
+                    anchors.centerIn: parent
+                    text: "power_settings_new"
+                    color: Colours.palette.m3error
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        const state = ShellState.forScreen(scope.modelData);
+                        if (state)
+                            state.session = !state.session;
+                    }
                 }
             }
         }
