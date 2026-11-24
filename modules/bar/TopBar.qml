@@ -167,6 +167,46 @@ Variants {
             }
         }
 
+        // Quick launcher for the installed GTK file manager (Thunar).
+        Process {
+            id: openFileManager
+            command: ["thunar"]
+        }
+
+        StyledWindow {
+            name: "topbar-file-manager"
+            screen: scope.modelData
+            anchors.top: true
+            anchors.left: true
+            margins.top: scope.edgeGap
+            margins.left: scope.leftInset + scope.logoWidth + scope.clockWidth + scope.alertsWidth + 3 * scope.gap
+            implicitWidth: 34
+            implicitHeight: scope.pillHeight
+            WlrLayershell.exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.layer: WlrLayer.Overlay
+
+            Rectangle {
+                anchors.fill: parent
+                radius: height / 2
+                color: scope.pillColour
+
+                MaterialIcon {
+                    anchors.centerIn: parent
+                    text: "folder"
+                    color: scope.networkAccent
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        if (!openFileManager.running)
+                            openFileManager.running = true;
+                    }
+                }
+            }
+        }
+
         StyledWindow {
             id: workspacesWindow
             name: "topbar-workspaces"
@@ -560,7 +600,7 @@ Variants {
             anchors.right: true
             margins.top: scope.edgeGap
             // Immediately left of Settings in the right-hand group.
-            margins.right: scope.afterAudio + scope.traySpace + 2 * (34 + scope.gap)
+            margins.right: scope.afterAudio + scope.traySpace + 34 + scope.gap
             implicitWidth: 34
             implicitHeight: scope.pillHeight
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
@@ -601,7 +641,7 @@ Variants {
             anchors.right: true
             margins.top: scope.edgeGap
             // Keep Settings on the right, independent from the centred controls.
-            margins.right: scope.afterAudio + scope.traySpace + 34 + scope.gap
+            margins.right: scope.afterAudio + scope.traySpace
             implicitWidth: 34
             implicitHeight: scope.pillHeight
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
