@@ -656,14 +656,13 @@ Variants {
             }
         }
 
-        // Switch to a random wallpaper from the user's collection on demand.
-        // No background polling: this process runs only when the capsule is clicked.
+        // Advance wallpapers in alphabetical order (A-Z), looping after the last.
+        // The helper remembers its position across Caelestia restarts.
         Process {
             id: nextWallpaper
             command: [
-                Quickshell.env("HOME") + "/.local/bin/caelestia",
-                "wallpaper", "-r",
-                Quickshell.env("HOME") + "/Pictures/Wallpapers"
+                "/usr/bin/python3",
+                Quickshell.env("HOME") + "/.config/quickshell/caelestia/scripts/next-wallpaper.py"
             ]
             stderr: StdioCollector {
                 onStreamFinished: {
@@ -693,7 +692,7 @@ Variants {
 
                 MaterialIcon {
                     anchors.centerIn: parent
-                    text: "shuffle"
+                    text: "skip_next"
                     color: scope.volumeAccent
                 }
 
