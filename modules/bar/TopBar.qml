@@ -692,7 +692,7 @@ Variants {
 
                 MaterialIcon {
                     anchors.centerIn: parent
-                    text: "skip_next"
+                    text: "shuffle"
                     color: scope.volumeAccent
                 }
 
