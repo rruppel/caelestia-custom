@@ -1,0 +1,12 @@
+[Unit]
+Description=Automatic Caelestia wallpaper rotation every 30 minutes
+
+[Timer]
+OnStartupSec=30min
+OnUnitActiveSec=30min
+AccuracySec=1min
+Persistent=false
+Unit=caelestia-wallpaper.service
+
+[Install]
+WantedBy=timers.target
