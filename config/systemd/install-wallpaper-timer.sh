@@ -15,6 +15,7 @@ for name in caelestia-wallpaper.service caelestia-wallpaper.timer; do
   ln -sfn "$src/$name" "$target"
 done
 systemctl --user daemon-reload
-systemctl --user enable --now caelestia-wallpaper.timer
+systemctl --user enable caelestia-wallpaper.timer
+systemctl --user restart caelestia-wallpaper.timer
 echo "Alphabetical wallpaper rotation installed (every 30 minutes)."
 echo "TopBar right-click controls pause/resume. Left-click advances and resumes."
