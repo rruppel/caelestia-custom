@@ -668,7 +668,11 @@ Variants {
             id: nextWallpaper
             command: ["/usr/bin/python3", scope.wallpaperScript, "next"]
             stdout: StdioCollector {
-                onStreamFinished: scope.wallpaperPaused = false
+                onStreamFinished: {
+                    // Only unpause after successfully applying a wallpaper.
+                    if (text.trim().startsWith("Wallpaper "))
+                        scope.wallpaperPaused = false;
+                }
             }
             stderr: StdioCollector {
                 onStreamFinished: {
