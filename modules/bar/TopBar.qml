@@ -656,19 +656,61 @@ Variants {
             }
         }
 
-        // Advance wallpapers in alphabetical order (A-Z), looping after the last.
-        // The helper remembers its position across Caelestia restarts.
+        // Shared persistent pause status is also read by the systemd rotation
+        // timer. The right-click menu changes state; left-click advances and
+        // resumes automatic cycling without changing the familiar shuffle icon.
+        property bool wallpaperPaused: false
+        property bool wallpaperMenuOpen: false
+        readonly property string wallpaperScript: Quickshell.env("HOME") +
+            "/.config/quickshell/caelestia/scripts/next-wallpaper.py"
+
         Process {
             id: nextWallpaper
-            command: [
-                "/usr/bin/python3",
-                Quickshell.env("HOME") + "/.config/quickshell/caelestia/scripts/next-wallpaper.py"
-            ]
+            command: ["/usr/bin/python3", scope.wallpaperScript, "next"]
+            stdout: StdioCollector {
+                onStreamFinished: scope.wallpaperPaused = false
+            }
             stderr: StdioCollector {
                 onStreamFinished: {
                     if (text.trim().length > 0)
                         console.warn("TopBar wallpaper switch:", text.trim());
                 }
+            }
+        }
+
+        Process {
+            id: wallpaperPauseToggle
+            command: ["/usr/bin/python3", scope.wallpaperScript, scope.wallpaperPaused ? "resume" : "pause"]
+            stdout: StdioCollector {
+                onStreamFinished: {
+                    scope.wallpaperPaused = text.trim() === "paused";
+                    scope.wallpaperMenuOpen = false;
+                }
+            }
+            stderr: StdioCollector {
+                onStreamFinished: {
+                    if (text.trim())
+                        console.warn("TopBar wallpaper pause:", text.trim());
+                }
+            }
+        }
+
+        Process {
+            id: wallpaperPauseStatus
+            command: ["/usr/bin/python3", scope.wallpaperScript, "status"]
+            stdout: StdioCollector {
+                onStreamFinished: scope.wallpaperPaused = text.trim() === "paused"
+            }
+        }
+
+        Timer {
+            interval: 5000
+            repeat: true
+            running: true
+            triggeredOnStart: true
+            onTriggered: {
+                if (!wallpaperPauseStatus.running && !wallpaperPauseToggle.running && !nextWallpaper.running)
+                    wallpaperPauseStatus.running = true;
             }
         }
 
@@ -699,9 +741,68 @@ Variants {
                 MouseArea {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+                    onClicked: mouse => {
+                        if (mouse.button === Qt.RightButton) {
+                            scope.wallpaperMenuOpen = !scope.wallpaperMenuOpen;
+                            if (scope.wallpaperMenuOpen && !wallpaperPauseStatus.running)
+                                wallpaperPauseStatus.running = true;
+                        } else {
+                            scope.wallpaperMenuOpen = false;
+                            if (!nextWallpaper.running && !wallpaperPauseToggle.running)
+                                nextWallpaper.running = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Popup is its own layer-shell window, avoiding clipping by the 34px
+        // TopBar capsule. Clicking the wallpaper icon again closes the menu.
+        StyledWindow {
+            name: "topbar-wallpaper-menu"
+            screen: scope.modelData
+            visible: scope.wallpaperMenuOpen
+            anchors.top: true
+            anchors.right: true
+            margins.top: scope.edgeGap + scope.pillHeight + 7
+            margins.right: scope.afterAudio + scope.traySpace + 34 + scope.gap
+            implicitWidth: 205
+            implicitHeight: 46
+            WlrLayershell.exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.layer: WlrLayer.Overlay
+
+            Rectangle {
+                anchors.fill: parent
+                radius: 12
+                color: scope.pillColour
+                border.width: 1
+                border.color: Qt.alpha(scope.inkColour, 0.18)
+
+                Row {
+                    anchors.centerIn: parent
+                    spacing: 9
+
+                    MaterialIcon {
+                        text: scope.wallpaperPaused ? "play_arrow" : "pause"
+                        color: scope.volumeAccent
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    Text {
+                        text: scope.wallpaperPaused ? "Retomar transições" : "Pausar transições"
+                        color: scope.inkColour
+                        font.pixelSize: 12
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        if (!nextWallpaper.running)
-                            nextWallpaper.running = true;
+                        if (!wallpaperPauseToggle.running && !nextWallpaper.running)
+                            wallpaperPauseToggle.running = true;
                     }
                 }
             }
