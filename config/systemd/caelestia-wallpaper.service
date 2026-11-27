@@ -1,0 +1,6 @@
+[Unit]
+Description=Rotate Caelestia wallpaper alphabetically when not paused
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 %h/.config/quickshell/caelestia/scripts/next-wallpaper.py auto
