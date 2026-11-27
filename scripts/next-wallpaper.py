@@ -14,6 +14,7 @@ HOME = Path.home()
 WALLPAPERS = HOME / "Pictures" / "Wallpapers"
 STATE_DIR = Path(os.environ.get("XDG_STATE_HOME", str(HOME / ".local" / "state"))) / "caelestia-custom"
 STATE_FILE = STATE_DIR / "last-wallpaper"
+PAUSED_FILE = STATE_DIR / "wallpaper-paused"
 LOCK_FILE = STATE_DIR / "wallpaper.lock"
 CLI = HOME / ".local" / "bin" / "caelestia"
 EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif", ".avif"}
@@ -48,10 +49,30 @@ def next_wallpaper():
 
 
 def main():
+    mode = sys.argv[1] if len(sys.argv) > 1 else "next"
+    if mode not in {"next", "auto", "status", "pause", "resume"}:
+        raise SystemExit("usage: next-wallpaper.py [next|auto|status|pause|resume]")
+
     STATE_DIR.mkdir(parents=True, exist_ok=True)
     with LOCK_FILE.open("a+") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
-        next_wallpaper()
+        if mode == "status":
+            print("paused" if PAUSED_FILE.exists() else "running")
+        elif mode == "pause":
+            PAUSED_FILE.touch()
+            print("paused")
+        elif mode == "resume":
+            PAUSED_FILE.unlink(missing_ok=True)
+            print("running")
+        elif mode == "auto":
+            if PAUSED_FILE.exists():
+                print("paused: skipping automatic wallpaper change")
+            else:
+                next_wallpaper()
+        else:
+            # Manual advancement always resumes automatic changes.
+            next_wallpaper()
+            PAUSED_FILE.unlink(missing_ok=True)
 
 
 if __name__ == "__main__":
